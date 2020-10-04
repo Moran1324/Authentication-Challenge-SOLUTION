@@ -5,7 +5,8 @@
   "main": "start.js",
   "scripts": {
     "test": "node_modules/.bin/jest",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "start": ""
   },
   "keywords": [],
   "author": "",
