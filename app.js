@@ -1,4 +1,6 @@
-require('dotenv').config();
+// require('dotenv').config();
+const ACCESS_TOKEN_SECRET =  '123456';
+const REFRESH_TOKEN_SECRET = '987654';
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const morgan = require('morgan');
@@ -45,7 +47,7 @@ app.options('/',(req, res) => {
     RestOptions = OPTIONSMETHOD.slice(0, 2)
     res.json(RestOptions)
   }
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+  jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
       RestOptions = OPTIONSMETHOD.slice(0, 3)
       res.json(RestOptions)
@@ -75,7 +77,7 @@ app.post('/users/login', async (req, res) => {
   if (!user) return res.status(404).json({message: 'cannot find user'});
   if (await bcrypt.compare(req.body.password, user.password)) {
       const accessToken = generateAccessToken(user);
-      const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+      const refreshToken = jwt.sign(user, REFRESH_TOKEN_SECRET);
       REFRESH_TOKENS.push(refreshToken);
     res.json({ accessToken, refreshToken , userName: user.name, isAdmin: user.isAdmin});
     } else {
@@ -85,7 +87,7 @@ app.post('/users/login', async (req, res) => {
 
 // function for access keys generation, uses server's secret key and user details.
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '30s'});
+  return jwt.sign(user, ACCESS_TOKEN_SECRET, {expiresIn: '30s'});
 };
 
 // Validates access token with the server
@@ -93,7 +95,7 @@ function checkToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) return res.status(401).json({message: "Access Token Required"});
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+  jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) return res.status(403).json({message: "Invalid Access Token"});
     req.decoded = decoded;
     next();
@@ -105,7 +107,7 @@ app.post('/users/token', (req, res) => {
   const refreshToken = req.body.token;
   if (!refreshToken) return res.status(401).json({message: "Refresh Token Required"});
   if (!REFRESH_TOKENS.includes(refreshToken)) return res.status(403).json({message: "Invalid Refresh Token"});
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded)=>{
+  jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, decoded)=>{
     if (err) return res.status(403).json({message: "Invalid Refresh Token"});
     const newUser = { 
                       name: decoded.name, 
