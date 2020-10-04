@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "start.js",
+  "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/jest",
     "dev": "nodemon index.js",
